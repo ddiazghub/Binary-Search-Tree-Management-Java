@@ -1,0 +1,562 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package abbgui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
+
+/**
+ *
+ * @author david
+ */
+public class ABBGUI extends javax.swing.JFrame {
+
+    public final ABin tree;
+    public final TreeDrawer drawer;
+    public final SinglyLinkedListDrawer listDrawer;
+    public Thread traversalThread;
+    public Thread deleteThread;
+
+    /**
+     * Creates new form GUI
+     */
+    public ABBGUI() {
+        initComponents();
+
+        this.tree = new ABin();
+        this.drawer = new TreeDrawer(this.tree, (Graphics2D) this.treeAnimationPanel.getGraphics());
+        this.listDrawer = new SinglyLinkedListDrawer(null, (Graphics2D) this.listPanel.getGraphics());
+        this.traversalThread = null;
+    }
+
+    // Crea un hilo que se encarga de mostrar gráficamente el recorrido del árbol
+    private Thread createTraversalThread(final TraversalAlgorithm algorithm) {
+        final JTextPane pane = this.traversalResultPanel;
+        pane.setText("");
+
+        return new Thread() {
+            @Override
+            public void run() {
+                for (NodoB node : tree.traverse(algorithm)) {
+                    drawer.setSelected(node);
+                    pane.setText(pane.getText() + node.dato + " ");
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                drawer.setSelected(null);
+            }
+        };
+    }
+
+    private void addNode(int data) {
+        if (this.tree.insertaNodo(data)) {
+            this.updateUI();
+        } else {
+            showError("El dato ya existe");
+        }
+    }
+
+    private void deleteNode(int data) {
+        if (this.tree.deleteNode(data)) {
+            this.updateUI();
+        } else {
+            showError("El dato no existe");
+        }
+    }
+
+    private static void showError(String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void updateUI() {
+        this.treeSizeLabel.setText(Integer.toString(this.tree.tamaño(this.tree.Raiz)));
+        this.treeHeightLabel.setText(Integer.toString(this.tree.altura(this.tree.Raiz)));
+        this.treeLeafNodesLabel.setText(Integer.toString(this.tree.hojas(this.tree.Raiz)));
+        this.treeCompleteNodesLabel.setText(Integer.toString(this.tree.completos(this.tree.Raiz)));
+        this.drawer.draw();
+    }
+    
+    private Thread createDeleteThread() {
+        return new Thread() {
+            @Override
+            public void run() {
+                for (NodoB node : tree.postOrden()) {
+                    updateUI();
+                    drawer.setDeleted(node);
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    
+                    deleteNode(node.dato);
+                }
+
+                drawer.setDeleted(null);
+                deleteThread = null;
+            }
+        };
+    }
+    
+    public static int BuscaPapa(NodoB raiz,int val, int parent) {
+        if (raiz == null) {
+            return Integer.MIN_VALUE;
+        }
+        
+        // If current node is the required node
+        if (raiz.dato == val) {
+            return parent;
+        }
+        
+        if (val < raiz.dato) {
+            return BuscaPapa(raiz.Hizq, val, raiz.dato);
+        }
+            
+        return BuscaPapa(raiz.Hder, val, raiz.dato);
+    }
+    
+    public NodoB HermanoDelPapa(NodoB nodo, int papa) {
+        if (nodo == null || nodo.dato == papa) {
+            return null;
+        }
+
+        if (nodo.hasRight() && nodo.hasLeft()) {
+            if (nodo.Hizq.dato == papa) {
+                return nodo.Hder;
+            }
+
+            if (nodo.Hder.dato == papa) {
+                return nodo.Hizq;
+            }
+        } else if (nodo.hasLeft() && nodo.Hizq.dato == papa) {
+            return null;
+        } else if (nodo.hasRight() && nodo.Hder.dato == papa) {
+            return null;
+        }
+        
+        if (papa < nodo.dato)
+            return HermanoDelPapa(nodo.Hizq, papa);
+
+        if (papa > nodo.dato)
+            return HermanoDelPapa(nodo.Hder, papa);
+       
+        return null;
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        formPanel = new javax.swing.JPanel();
+        traverseButton = new javax.swing.JButton();
+        addNodeButton = new javax.swing.JButton();
+        addNodeSpinner = new javax.swing.JSpinner();
+        traversalAlgorithmList = new javax.swing.JComboBox<>();
+        jLabel8 = new javax.swing.JLabel();
+        treeCompleteNodesLabel = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        treeLeafNodesLabel = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        treeHeightLabel = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        treeSizeLabel = new javax.swing.JLabel();
+        traversalResultPanel = new javax.swing.JTextPane();
+        jLabel1 = new javax.swing.JLabel();
+        deleteNodeButton = new javax.swing.JButton();
+        clearButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        Tio = new javax.swing.JButton();
+        ResTio = new javax.swing.JTextField();
+        levelSelectSpinner = new javax.swing.JSpinner();
+        selectLevelButton = new javax.swing.JButton();
+        listPanel = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        treeAnimationPanel = new javax.swing.JPanel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Interfaz Gráfica Árbol Binario");
+
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel1.setPreferredSize(new java.awt.Dimension(945, 515));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel2.setPreferredSize(new java.awt.Dimension(820, 150));
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        formPanel.setBackground(new java.awt.Color(255, 102, 102));
+        formPanel.setMinimumSize(new java.awt.Dimension(341, 110));
+        formPanel.setPreferredSize(new java.awt.Dimension(820, 150));
+        formPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        traverseButton.setBackground(new java.awt.Color(0, 102, 0));
+        traverseButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        traverseButton.setForeground(new java.awt.Color(204, 204, 204));
+        traverseButton.setText("Recorrer");
+        traverseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                traverseButtonActionPerformed(evt);
+            }
+        });
+        formPanel.add(traverseButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 80, 80, 30));
+
+        addNodeButton.setBackground(new java.awt.Color(0, 102, 0));
+        addNodeButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        addNodeButton.setForeground(new java.awt.Color(204, 204, 204));
+        addNodeButton.setText("Agregar");
+        addNodeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addNodeButtonActionPerformed(evt);
+            }
+        });
+        formPanel.add(addNodeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 20, 80, 30));
+
+        addNodeSpinner.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        addNodeSpinner.setModel(new javax.swing.SpinnerNumberModel());
+        formPanel.add(addNodeSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 90, 30));
+
+        traversalAlgorithmList.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        traversalAlgorithmList.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Preorden", "Inorden", "Postorden", "Niveles" }));
+        traversalAlgorithmList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                traversalAlgorithmListActionPerformed(evt);
+            }
+        });
+        formPanel.add(traversalAlgorithmList, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 90, 30));
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel8.setText("Completos:");
+        formPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 100, -1, -1));
+
+        treeCompleteNodesLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        treeCompleteNodesLabel.setText("0");
+        formPanel.add(treeCompleteNodesLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 100, 30, -1));
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel6.setText("Hojas:");
+        formPanel.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 80, -1, -1));
+
+        treeLeafNodesLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        treeLeafNodesLabel.setText("0");
+        formPanel.add(treeLeafNodesLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 80, 30, -1));
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel4.setText("Altura:");
+        formPanel.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 60, -1, -1));
+
+        treeHeightLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        treeHeightLabel.setText("0");
+        formPanel.add(treeHeightLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 30, -1));
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel3.setText("Tamaño:");
+        formPanel.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 40, -1, -1));
+
+        treeSizeLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        treeSizeLabel.setText("0");
+        formPanel.add(treeSizeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 40, 20, -1));
+
+        traversalResultPanel.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        formPanel.add(traversalResultPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 430, 40));
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel1.setText("Resultado del recorrido");
+        formPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 150, -1));
+
+        deleteNodeButton.setBackground(new java.awt.Color(255, 0, 0));
+        deleteNodeButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        deleteNodeButton.setForeground(new java.awt.Color(204, 204, 204));
+        deleteNodeButton.setText("Eliminar");
+        deleteNodeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteNodeButtonActionPerformed(evt);
+            }
+        });
+        formPanel.add(deleteNodeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 80, 30));
+
+        clearButton.setBackground(new java.awt.Color(255, 0, 0));
+        clearButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        clearButton.setForeground(new java.awt.Color(204, 204, 204));
+        clearButton.setText("Limpiar");
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearButtonActionPerformed(evt);
+            }
+        });
+        formPanel.add(clearButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 80, 30));
+
+        jPanel3.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel3.setPreferredSize(new java.awt.Dimension(880, 5));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 880, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 5, Short.MAX_VALUE)
+        );
+
+        formPanel.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 880, 5));
+
+        Tio.setBackground(new java.awt.Color(0, 102, 0));
+        Tio.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        Tio.setForeground(new java.awt.Color(204, 204, 204));
+        Tio.setText("Tio");
+        Tio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TioActionPerformed(evt);
+            }
+        });
+        formPanel.add(Tio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 90, 30));
+
+        ResTio.setEditable(false);
+        formPanel.add(ResTio, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 50, 160, 30));
+
+        levelSelectSpinner.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        levelSelectSpinner.setModel(new javax.swing.SpinnerNumberModel());
+        formPanel.add(levelSelectSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 90, 30));
+
+        selectLevelButton.setBackground(new java.awt.Color(0, 102, 0));
+        selectLevelButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        selectLevelButton.setForeground(new java.awt.Color(204, 204, 204));
+        selectLevelButton.setText("Seleccionar nivel");
+        selectLevelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectLevelButtonActionPerformed(evt);
+            }
+        });
+        formPanel.add(selectLevelButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 160, 30));
+
+        javax.swing.GroupLayout listPanelLayout = new javax.swing.GroupLayout(listPanel);
+        listPanel.setLayout(listPanelLayout);
+        listPanelLayout.setHorizontalGroup(
+            listPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 430, Short.MAX_VALUE)
+        );
+        listPanelLayout.setVerticalGroup(
+            listPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 50, Short.MAX_VALUE)
+        );
+
+        formPanel.add(listPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 90, 430, 50));
+
+        jPanel2.add(formPanel, java.awt.BorderLayout.PAGE_END);
+
+        jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.LINE_AXIS));
+
+        treeAnimationPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel4.add(treeAnimationPanel);
+
+        jPanel2.add(jPanel4, java.awt.BorderLayout.CENTER);
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 880, 590));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 918, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 906, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 612, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void traversalAlgorithmListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_traversalAlgorithmListActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_traversalAlgorithmListActionPerformed
+
+    private void addNodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNodeButtonActionPerformed
+        if (this.tree.altura(this.tree.Raiz) >= 12) {
+            showError("El árbol ha llegado a la máxima altura establecida en este programa, no se puede añadir el nodo");
+
+            return;
+        }
+
+        this.addNode((int) this.addNodeSpinner.getValue());
+
+    }//GEN-LAST:event_addNodeButtonActionPerformed
+
+    private void traverseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_traverseButtonActionPerformed
+        if (this.tree.isEmpty()) {
+            showError("El árbol está vacío");
+            return;
+        }
+
+        if (this.traversalThread != null) {
+            this.traversalThread.stop();
+            this.drawer.draw();
+        }
+
+        switch (this.traversalAlgorithmList.getSelectedIndex()) {
+            case 0:
+                this.traversalThread = this.createTraversalThread(TraversalAlgorithm.PREORDER);
+                break;
+
+            case 1:
+                this.traversalThread = this.createTraversalThread(TraversalAlgorithm.INORDER);
+                break;
+
+            case 2:
+                this.traversalThread = this.createTraversalThread(TraversalAlgorithm.POSTORDER);
+                break;
+
+            case 3:
+                this.traversalThread = this.createTraversalThread(TraversalAlgorithm.LEVELORDER);
+                break;
+        }
+
+        this.traversalThread.start();
+    }//GEN-LAST:event_traverseButtonActionPerformed
+
+    private void deleteNodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteNodeButtonActionPerformed
+        if (this.tree.isEmpty()) {
+            showError("El arbol está vacío. No hay nodos para borrar");
+            return;
+        }
+
+        this.deleteNode((int) this.addNodeSpinner.getValue());
+    }//GEN-LAST:event_deleteNodeButtonActionPerformed
+
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
+        if (this.tree.isEmpty()) {
+            showError("El arbol ya está vacío");
+            return;
+        }
+        
+        while (this.deleteThread != null) {}
+        
+        this.deleteThread = this.createDeleteThread();
+        this.deleteThread.start();
+    }//GEN-LAST:event_clearButtonActionPerformed
+
+    private void TioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TioActionPerformed
+        // TODO add your handling code here:
+        int padre=BuscaPapa(this.tree.Raiz,(int) addNodeSpinner.getValue(), -1);
+        NodoB Tio = HermanoDelPapa(this.tree.Raiz, padre);
+        
+        if (Tio == null)
+            ResTio.setText("No tiene tio");
+        else
+            ResTio.setText(Integer.toString(Tio.dato));
+            
+    }//GEN-LAST:event_TioActionPerformed
+
+    private void selectLevelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectLevelButtonActionPerformed
+        int level = (int) levelSelectSpinner.getValue();
+        
+        if (level < 0) {
+            showError("El nivel no existe");
+            return;
+        }
+        
+        this.listDrawer.list = this.tree.getLevel(level);
+        
+        if (this.listDrawer.list == null) {
+            showError("El nivel no existe");
+            return;
+        }
+        
+        this.listDrawer.draw();
+    }//GEN-LAST:event_selectLevelButtonActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ABBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ABBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ABBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ABBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ABBGUI().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField ResTio;
+    private javax.swing.JButton Tio;
+    private javax.swing.JButton addNodeButton;
+    private javax.swing.JSpinner addNodeSpinner;
+    private javax.swing.JButton clearButton;
+    private javax.swing.JButton deleteNodeButton;
+    private javax.swing.JPanel formPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JSpinner levelSelectSpinner;
+    private javax.swing.JPanel listPanel;
+    private javax.swing.JButton selectLevelButton;
+    private javax.swing.JComboBox<String> traversalAlgorithmList;
+    private javax.swing.JTextPane traversalResultPanel;
+    private javax.swing.JButton traverseButton;
+    private javax.swing.JPanel treeAnimationPanel;
+    private javax.swing.JLabel treeCompleteNodesLabel;
+    private javax.swing.JLabel treeHeightLabel;
+    private javax.swing.JLabel treeLeafNodesLabel;
+    private javax.swing.JLabel treeSizeLabel;
+    // End of variables declaration//GEN-END:variables
+}
